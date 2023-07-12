@@ -32,6 +32,7 @@
 #include <boost/regex.hpp>
 
 #include "solver.h"
+#include <deque>
 
 namespace INCLUDE_GARDENER {
 
