@@ -50,3 +50,4 @@ test/cmd_line/test-reports
 __pycache__/
 *.py[cod]
 
+result/

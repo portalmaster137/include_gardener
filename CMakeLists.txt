@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.6)
+cmake_minimum_required (VERSION 3.10)
 project (INCLUDE_GARDENER)
 
 set (GARDENER_VERSION_MAJOR X)
@@ -87,45 +87,14 @@ enable_testing ()
 
 #########
 #
-# Download and unpack googletest at configure time
-#      configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-#
-#
-#
-# Download and unpack googletest at configure time
-configure_file (CMakeLists.txt.in
-              googletest-download/CMakeLists.txt)
-execute_process (COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-                 RESULT_VARIABLE result
-                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if (result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif ()
-
-
-execute_process (COMMAND ${CMAKE_COMMAND} --build .
-                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if (result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
-endif ()
+# Use system GoogleTest
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTEST REQUIRED gtest>=1.10)
+pkg_check_modules(GMOCK REQUIRED gmock>=1.10)
 
 # Prevent Googletest from overriding our compiler/linker options
 # when building with Visual Studio
 set (gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# Add googletest directly to our build. This adds
-# the following targets: gtest, gtest_main, gmock
-# and gmock_main
-add_subdirectory (${CMAKE_BINARY_DIR}/googletest-src
-                  ${CMAKE_BINARY_DIR}/googletest-build)
-
-# The gtest/gmock targets carry header search path
-# dependencies automatically when using CMake 2.8.11 or
-# later. Otherwise we must add them here ourselves.
-if (CMAKE_VERSION VERSION_LESS 2.8.11)
-    include_directories("${gtest_SOURCE_DIR}/include"
-                        "${gmock_SOURCE_DIR}/include")
-endif()
 #
 ########
 
@@ -137,16 +106,10 @@ add_executable (unit_test
                 ${SOURCE_FILES}
                 ${UNIT_TEST_SOURCE_FILES})
 
-add_dependencies (unit_test gmock)
-add_dependencies (unit_test gtest)
-add_dependencies (unit_test gtest_main)
-link_directories (${CMAKE_BINARY_DIR}/googletest-build/googlemock)
-link_directories (${CMAKE_BINARY_DIR}/googletest-build/googlemock/gtest)
-
 target_link_libraries (unit_test  ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries (unit_test  ${Boost_LIBRARIES})
-target_link_libraries (unit_test  gtest_main)
-target_link_libraries (unit_test  gmock_main)
+target_link_libraries (unit_test  ${GTEST_LIBRARIES})
+target_link_libraries (unit_test  ${GMOCK_LIBRARIES})
 
 set (TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 

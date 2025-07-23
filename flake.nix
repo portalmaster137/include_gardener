@@ -92,10 +92,14 @@
           nativeBuildInputs = with pkgs; [
             cmake
             pkg-config
+            git
           ];
           
           buildInputs = with pkgs; [
             boost
+            doxygen
+            graphviz
+            gtest
           ];
           
           configurePhase = ''
@@ -105,12 +109,10 @@
           '';
           
           buildPhase = ''
-            cd build
             make -j$NIX_BUILD_CORES
           '';
           
           installPhase = ''
-            cd build
             mkdir -p $out/bin
             cp include_gardener $out/bin/
           '';
